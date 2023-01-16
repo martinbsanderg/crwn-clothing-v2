@@ -16,29 +16,44 @@ export const addCartItem = (cartItems, productToAdd) => {
   return [...cartItems, { ...productToAdd, quantity: 1 }];
 };
 
-export const removeCartItem = (cartItems, productToRemove) =>{
-  
-  const newCartItems = cartItems.reduce(
-    (array, item) => {
-      if (item.id === productToRemove.id){
-        return array
-      }
-      return [...array, item]
+export const removeCartItem = (cartItems, productToRemove) => {
+  const newCartItems = cartItems.reduce((array, item) => {
+    if (item.id === productToRemove.id) {
+      return [...array];
     }
-  );
+    return [...array, item];
+  }, []);
 
   // const index = cartItems.indexOf(existingCartItem);
   // const newCartItems=cartItems.splice(index,index+1)
-  return newCartItems
-}
+  return newCartItems;
+};
 
 export const CartContext = createContext({
   isCartOpen: false,
   setIsOpen: () => {},
   cartItems: [],
   addItemToCart: () => {},
-  removeItemFromCart: ()=>{},
+  removeItemFromCart: () => {},
+  reduceItemInCart: () => {},
 });
+
+export const reduceCartItem = (cartItems, productToReduce) => {
+  const existingCartItem = cartItems.find(
+    (cartItem) => cartItem.id === productToReduce.id
+  );
+  
+  if (existingCartItem.quantity === 1) {
+    return removeCartItem(cartItems, productToReduce);
+    
+  } else {
+    return cartItems.map((cartItem) =>
+      cartItem.id === productToReduce.id
+        ? { ...cartItem, quantity: cartItem.quantity - 1 }
+        : cartItem
+    );
+  }
+};
 
 export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -55,11 +70,22 @@ export const CartProvider = ({ children }) => {
 
   const addItemToCart = (product) =>
     setCartItems(addCartItem(cartItems, product));
-  
-    const removeItemFromCart = (product) => 
-    setCartItems(removeCartItem(cartItems, product))
 
-  const value = { isCartOpen, setIsCartOpen, cartItems, addItemToCart, cartCount, removeItemFromCart };
+  const removeItemFromCart = (product) =>
+    setCartItems(removeCartItem(cartItems, product));
+
+  const reduceItemInCart = (product) =>
+    setCartItems(reduceCartItem(cartItems, product));
+
+  const value = {
+    isCartOpen,
+    setIsCartOpen,
+    cartItems,
+    addItemToCart,
+    cartCount,
+    removeItemFromCart,
+    reduceItemInCart,
+  };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
