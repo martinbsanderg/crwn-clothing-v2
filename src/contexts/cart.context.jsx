@@ -17,16 +17,7 @@ export const addCartItem = (cartItems, productToAdd) => {
 };
 
 export const removeCartItem = (cartItems, productToRemove) => {
-  const newCartItems = cartItems.reduce((array, item) => {
-    if (item.id === productToRemove.id) {
-      return [...array];
-    }
-    return [...array, item];
-  }, []);
-
-  // const index = cartItems.indexOf(existingCartItem);
-  // const newCartItems=cartItems.splice(index,index+1)
-  return newCartItems;
+  return cartItems.filter(cartItem => cartItem.id !== productToRemove.id)
 };
 
 export const CartContext = createContext({
